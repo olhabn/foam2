@@ -164,6 +164,7 @@ var classes = [
   'foam.dao.index.PersistedIndexTest',
   'foam.dao.SequenceNumberDAO',
   'foam.dao.SequenceNumberDAOTest',
+  'foam.dao.StorageOptionalDAO',
   'foam.dao.PipelinePMDAO',
   'foam.dao.PMDAO',
   'foam.nanos.pm.PMInfo',
@@ -408,6 +409,7 @@ var classes = [
   'foam.lib.PropertyPredicate',
   'foam.lib.PermissionedPropertyPredicate',
   'foam.lib.NetworkPropertyPredicate',
+  'foam.lib.StorageOptionalPropertyPredicate',
   'foam.lib.StoragePropertyPredicate',
   'foam.lib.AndPropertyPredicate',
   'foam.lib.parse.Parser',
@@ -618,6 +620,7 @@ var classes = [
   'foam.nanos.approval.FulfilledApprovablePredicate',
   'foam.nanos.approval.FulfilledApprovableRule',
   'foam.nanos.approval.AuthenticatedApprovalDAOAuthorizer',
+  'foam.nanos.approval.PopulateApprovalRequestsDAO'
 ];
 
 var abstractClasses = [
