@@ -11,6 +11,7 @@ import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.lib.json.OutputJSON;
+import foam.lib.PropertyPredicate;
 import foam.util.SafetyUtil;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
@@ -29,6 +30,30 @@ import java.util.*;
    to String.
 8. Use Fast TimeStamper or similar
 
+*/
+
+/* Example use:
+  protected static final ThreadLocal<foam.lib.formatter.FObjectFormatter> formatter_ = new ThreadLocal<foam.lib.formatter.FObjectFormatter>() {
+        @Override
+        protected foam.lib.formatter.JSONFObjectFormatter initialValue() {
+          foam.lib.formatter.JSONFObjectFormatter formatter = new foam.lib.formatter.JSONFObjectFormatter();
+          formatter.setQuoteKeys(true);
+          formatter.setPropertyPredicate(new foam.lib.AndPropertyPredicate(new foam.lib.PropertyPredicate[] {new foam.lib.NetworkPropertyPredicate(), new foam.lib.PermissionedPropertyPredicate()}));
+          return formatter;
+        }
+
+       @Override
+       public FObjectFormatter get() {
+         FObjectFormatter formatter = super.get();
+         formatter.setX(getX());
+         formatter.reset();
+         return formatter;
+       }
+    };
+  ...
+  foam.lib.formatter.FObjectFormatter formatter = formatter_.get();
+  formatter.output(fObj);
+  writer.append(formatter.builder());
 */
 
 public class JSONFObjectFormatter
@@ -52,7 +77,6 @@ public class JSONFObjectFormatter
   protected boolean outputClassNames_    = true;
   protected boolean outputReadableDates_ = true;
   protected boolean outputDefaultClassNames_ = true;
-
 
   public JSONFObjectFormatter(X x) {
     super(x);
@@ -284,42 +308,40 @@ public class JSONFObjectFormatter
     boolean   outputComma    = true;
     boolean   isDiff         = false;
     boolean   isPropertyDiff = false;
+    List      axioms         = getProperties(info);
+    int       size           = axioms.size();
 
-    if ( ! oldFObject.equals(newFObject) ) {
-      List axioms = getProperties(info);
-      int  size   = axioms.size();
+    for ( int i = 0 ; i < size ; i++ ) {
+      PropertyInfo prop = (PropertyInfo) axioms.get(i);
 
-      b_.append('{');
-      addInnerNewline();
-      for ( int i = 0 ; i < size ; i++ ) {
-        PropertyInfo prop = (PropertyInfo) axioms.get(i);
-        isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
-        if ( isPropertyDiff ) {
-          if ( ! isDiff ) {
-            if ( outputClassNames_ && outputDefaultClassNames_ ) {
-              //output Class name
-              outputKey("class");
-              b_.append(':');
-              output(newInfo.getId());
-              b_.append(',');
-            }
-            addInnerNewline();
-            PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
-            outputProperty(newFObject, id);
-            isDiff = true;
-            // to output class names for references
-            outputDefaultClassNames_ = true;
-          }
-          b_.append(',');
+      isPropertyDiff = prop.compare(oldFObject, newFObject) != 0;
+      if ( isPropertyDiff ) {
+        if ( ! isDiff ) {
+          b_.append('{');
           addInnerNewline();
-          outputProperty(newFObject, prop);
+          if ( outputClassNames_ && outputDefaultClassNames_ ) {
+            //output Class name
+            outputKey("class");
+            b_.append(':');
+            output(newInfo.getId());
+            b_.append(',');
+          }
+          addInnerNewline();
+          PropertyInfo id = (PropertyInfo) newInfo.getAxiomByName("id");
+          outputProperty(newFObject, id);
+          isDiff = true;
+          // to output class names for references
+          outputDefaultClassNames_ = true;
         }
-      }
-
-      if ( isDiff ) {
+        b_.append(',');
         addInnerNewline();
-        b_.append('}');
+        outputProperty(newFObject, prop);
       }
+    }
+
+    if ( isDiff ) {
+      addInnerNewline();
+      b_.append('}');
     }
   }
 
@@ -334,10 +356,6 @@ public class JSONFObjectFormatter
     if ( multiLineOutput_ ) {
       b_.append('\n');
     }
-  }
-
-  protected boolean maybeOutputPropertyDelta(FObject oldFObject, FObject newFObject, PropertyInfo prop) {
-    return prop.compare(oldFObject, newFObject) != 0;
   }
 
 /*
@@ -463,6 +481,11 @@ public class JSONFObjectFormatter
 
   public JSONFObjectFormatter setOutputDefaultClassNames(boolean f) {
     outputDefaultClassNames_ = f;
+    return this;
+  }
+
+  public JSONFObjectFormatter setOutputReadableDates(boolean f) {
+    outputReadableDates_ = f;
     return this;
   }
 
