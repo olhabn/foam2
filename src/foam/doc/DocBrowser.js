@@ -289,7 +289,7 @@ foam.CLASS({
           axs.push(ai);
         }
         return this.TableView.create({
-          of: this.EnumInfo,
+          of: foam.doc.EnumInfo,
           data: this.ArrayDAO.create({array: axs}),
           hoverSelection$: this.selectedAxiom$
         });
@@ -361,7 +361,7 @@ foam.CLASS({
         }
 
         return this.TableView.create({
-          of: this.AxiomInfo,
+          of: foam.doc.AxiomInfo,
           data: this.ArrayDAO.create({array: axs}),
           hoverSelection$: this.selectedAxiom$
         });

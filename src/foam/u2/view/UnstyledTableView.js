@@ -332,13 +332,15 @@ foam.CLASS({
                 if ( ! prop )
                   return;
 
+                view.__subContext__.columnConfigToPropertyConverter = foam.nanos.column.ColumnConfigToPropertyConverter.create();
+
                 var tableWidth = view.returnColumnPropertyForPropertyName(view, col, 'tableWidth');
 
                 this.start().
                   addClass(view.myClass('th')).
                   addClass(view.myClass('th-' + prop.name))
                   .style({ flex: tableWidth ? `0 0 ${tableWidth}px` : '1 0 0' })
-                  .add(view.__subContext__.columnConfigToPropertyConverter.returnColumnHeader(view.of, col)).
+                  .add(foam.nanos.column.ColumnConfigToPropertyConverter.create().returnColumnHeader(view.of, col)).
                   callIf(isFirstLevelProperty && prop.sortable, function() {
                     this.on('click', function(e) {
                       view.sortBy(prop);
@@ -609,7 +611,7 @@ foam.CLASS({
         }
       },
       function returnRecords(dao, propertyNamesToQuery) {
-        var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(dao.of, propertyNamesToQuery);
+        var expr = ( foam.nanos.column.ExpressionForArrayOfNestedPropertiesBuilder.create() ).buildProjectionForPropertyNamesArray(this.of, propertyNamesToQuery);
         return dao.select(expr);
       },
       function doesAllColumnsContainsColumnName(context, col) {
