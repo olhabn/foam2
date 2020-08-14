@@ -426,7 +426,7 @@ foam.CLASS({
                   addClass(view.myClass('tr')).
                   on('mouseover', function() {
                     if ( !thisObjValue ) {
-                      dao.find(val[0]).then(v => {
+                      dao.find_(view.__subContext__, val[0]).then(v => {
                       thisObjValue = v;
                       view.hoverSelection = thisObjValue;
                     });
