@@ -49,9 +49,6 @@ foam.CLASS({
       name: 'details'
     },
     {
-      name: 'body'
-    },
-    {
       name: 'supportDetails'
     },
     {
@@ -185,7 +182,7 @@ foam.CLASS({
     },
     {
       name: 'data',
-      section: 'body',
+      section: 'details',
       visibility: function(cmd) {
         return (cmd == 'PUT') ? foam.u2.DisplayMode.RW : foam.u2.DisplayMode.HIDDEN;
       }
@@ -263,7 +260,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'Description',
+      name: 'description',
       section: 'details',
       view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 144 }
     }
