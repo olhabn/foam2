@@ -424,9 +424,10 @@ foam.CLASS({
                   var tableRowElement = this.E();
                   tableRowElement.
                   addClass(view.myClass('tr')).
+                  startContext({ data: tbodyElement }).
                   on('mouseover', function() {
                     if ( !thisObjValue ) {
-                      dao.find_(view.__subContext__, val[0]).then(v => {
+                      dao.find(val[0]).then(v => {
                       thisObjValue = v;
                       view.hoverSelection = thisObjValue;
                     });
@@ -465,6 +466,7 @@ foam.CLASS({
                       }
                     });
                   }).
+                  endContext().
                   addClass(view.slot(function(selection) {
                     return selection && foam.util.equals(val[0], selection.id) ?
                         view.myClass('selected') : '';
