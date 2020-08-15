@@ -413,9 +413,9 @@ foam.CLASS({
             unitValueProperties.forEach(p => propertyNamesToQuery.push(p.property.unitPropName));
             var valPromises = view.returnRecords(proxy, propertyNamesToQuery);
 
-            var tbodyElement = this.
-              E();
-              tbodyElement.
+            var tbodyElement = this.E();
+
+            tbodyElement.
               addClass(view.myClass('tbody'));
               valPromises.then(function(values) {
 
@@ -423,126 +423,126 @@ foam.CLASS({
                   var thisObjValue;
                   var tableRowElement = this.E();
                   tableRowElement.
-                  addClass(view.myClass('tr')).
-                  startContext({ data: tbodyElement }).
-                  on('mouseover', function() {
-                    if ( !thisObjValue ) {
-                      dao.find(val[0]).then(v => {
-                      thisObjValue = v;
-                      view.hoverSelection = thisObjValue;
-                    });
-                    } else
-                      view.hoverSelection = thisObjValue;
-                  }).
-                  callIf(view.dblclick && ! view.disableUserSelection, function() {
-                    tableRowElement.on('dblclick', function() {
+                    addClass(view.myClass('tr')).
+                    startContext({ data: tbodyElement }).
+                    on('mouseover', function() {
                       if ( !thisObjValue ) {
-                        dao.find(val[0]).then(function(v) {
-                          thisObjValue = v;
-                          view.dblclick && view.dblclick(thisObjValue);
-                        });
-                      } else
-                        view.dblclick && view.dblclick(thisObjValue);
-                    });
-                  }).
-                  callIf( ! view.disableUserSelection, function() {
-                    tableRowElement.on('click', function(evt) {
-                      // If we're clicking somewhere to close the context menu,
-                      // don't do anything.
-                      if (
-                        evt.target.nodeName === 'DROPDOWN-OVERLAY' ||
-                        evt.target.classList.contains(view.myClass('vertDots'))
-                      ) return;
-
-                      if  ( !thisObjValue ) {
                         dao.find(val[0]).then(v => {
-                          view.selection = v;
-                          if ( view.importSelection$ ) view.importSelection = v;
-                          if ( view.editRecord$ ) view.editRecord(v);
-                        });
-                      } else {
-                        if ( view.importSelection$ ) view.importSelection = thisObjValue;
-                        if ( view.editRecord$ ) view.editRecord(thisObjValue);
-                      }
-                    });
-                  }).
-                  endContext().
-                  addClass(view.slot(function(selection) {
-                    return selection && foam.util.equals(val[0], selection.id) ?
-                        view.myClass('selected') : '';
-                  })).
-                  addClass(view.myClass('row')).
-                  style({ 'min-width': view.tableWidth_$ }).
-
-                  // If the multi-select feature is enabled, then we render a
-                  // Checkbox in the first cell of each row.
-                  callIf(view.multiSelectEnabled, function() {
-                    var slot = view.SimpleSlot.create();
-                    tableRowElement
-                      .start()
-                        .addClass(view.myClass('td'))
-                        .tag(view.CheckBox, { data: view.idsOfObjectsTheUserHasInteractedWith_[val[0]] ? !!view.selectedObjects[val[0]] : view.allCheckBoxesEnabled_ }, slot)
-                      .end();
-
-                    // Set up a listener so that when the user checks or unchecks
-                    // a box, we update the `selectedObjects` property.
-                    view.onDetach(slot.value$.dot('data').sub(function(_, __, ___, newValueSlot) {
-                      // If the user is checking or unchecking all boxes at once,
-                      // we only want to publish one propertyChange event, so we
-                      // trigger it from the listener in the table header instead
-                      // of here. This way we prevent a propertyChange being fired
-                      // for every single CheckBox's data changing.
-                      if ( view.togglingCheckBoxes_ ) return;
-
-                      // Remember that the user has interacted with this checkbox
-                      // directly. We need this because the ScrollTableView loads
-                      // tbody's in and out while the user scrolls, so we need to
-                      // handle the case when a user selects all, then unselects
-                      // a particular row, then scrolls far enough that the tbody
-                      // the selection was in unloads, then scrolls back into the
-                      // range where it reloads. We need to know if they've set
-                      // it to something already and we can't simply look at the
-                      // value on `selectedObjects` because then we won't know if
-                      // `selectedObjects[obj.id] === undefined` means they
-                      // haven't interacted with that checkbox or if it means they
-                      // explicitly set it to false. We could keep the key but set
-                      // the value to null, but that clutters up `selectedObjects`
-                      // because some values are objects and some are null. If we
-                      // use a separate set to remember which checkboxes the user
-                      // has interacted with, then we don't need to clutter up
-                      // `selectedObjects`.
-                      view.idsOfObjectsTheUserHasInteractedWith_[val[0]] = true;
-
-                      var checked = newValueSlot.get();
-
-                      if ( checked ) {
-                        var modification = {};
+                        thisObjValue = v;
+                        view.hoverSelection = thisObjValue;
+                      });
+                      } else
+                        view.hoverSelection = thisObjValue;
+                    }).
+                    callIf(view.dblclick && ! view.disableUserSelection, function() {
+                      tableRowElement.on('dblclick', function() {
                         if ( !thisObjValue ) {
+                          dao.find(val[0]).then(function(v) {
+                            thisObjValue = v;
+                            view.dblclick && view.dblclick(thisObjValue);
+                          });
+                        } else
+                          view.dblclick && view.dblclick(thisObjValue);
+                      });
+                    }).
+                    callIf( ! view.disableUserSelection, function() {
+                      tableRowElement.on('click', function(evt) {
+                        // If we're clicking somewhere to close the context menu,
+                        // don't do anything.
+                        if (
+                          evt.target.nodeName === 'DROPDOWN-OVERLAY' ||
+                          evt.target.classList.contains(view.myClass('vertDots'))
+                        ) return;
+
+                        if  ( !thisObjValue ) {
                           dao.find(val[0]).then(v => {
-                            modification[val[0]] = v;
-                            view.selectedObjects = Object.assign({}, view.selectedObjects, modification);
+                            view.selection = v;
+                            if ( view.importSelection$ ) view.importSelection = v;
+                            if ( view.editRecord$ ) view.editRecord(v);
                           });
                         } else {
-                          modification[val[0]] = thisObjValue;
-                          view.selectedObjects = Object.assign({}, view.selectedObjects, modification);
+                          if ( view.importSelection$ ) view.importSelection = thisObjValue;
+                          if ( view.editRecord$ ) view.editRecord(thisObjValue);
                         }
+                      });
+                    }).
+                    endContext().
+                    addClass(view.slot(function(selection) {
+                      return selection && foam.util.equals(val[0], selection.id) ?
+                          view.myClass('selected') : '';
+                    })).
+                    addClass(view.myClass('row')).
+                    style({ 'min-width': view.tableWidth_$ }).
 
-                      } else {
-                        var temp = Object.assign({}, view.selectedObjects);
-                        delete temp[val[0]];
-                        view.selectedObjects = temp;
-                      }
-                    }));
+                    // If the multi-select feature is enabled, then we render a
+                    // Checkbox in the first cell of each row.
+                    callIf(view.multiSelectEnabled, function() {
+                      var slot = view.SimpleSlot.create();
+                      tableRowElement
+                        .start()
+                          .addClass(view.myClass('td'))
+                          .tag(view.CheckBox, { data: view.idsOfObjectsTheUserHasInteractedWith_[val[0]] ? !!view.selectedObjects[val[0]] : view.allCheckBoxesEnabled_ }, slot)
+                        .end();
 
-                    // Store each CheckBox Element in a map so we have a reference
-                    // to them so we can set the `data` property of them when the
-                    // user checks the box to enable or disable all checkboxes.
-                    var checkbox = slot.get();
-                    view.checkboxes_[val[0]] = checkbox;
-                    checkbox.onDetach(function() {
-                      delete view.checkboxes_[val[0]];
+                      // Set up a listener so that when the user checks or unchecks
+                      // a box, we update the `selectedObjects` property.
+                      view.onDetach(slot.value$.dot('data').sub(function(_, __, ___, newValueSlot) {
+                        // If the user is checking or unchecking all boxes at once,
+                        // we only want to publish one propertyChange event, so we
+                        // trigger it from the listener in the table header instead
+                        // of here. This way we prevent a propertyChange being fired
+                        // for every single CheckBox's data changing.
+                        if ( view.togglingCheckBoxes_ ) return;
+
+                        // Remember that the user has interacted with this checkbox
+                        // directly. We need this because the ScrollTableView loads
+                        // tbody's in and out while the user scrolls, so we need to
+                        // handle the case when a user selects all, then unselects
+                        // a particular row, then scrolls far enough that the tbody
+                        // the selection was in unloads, then scrolls back into the
+                        // range where it reloads. We need to know if they've set
+                        // it to something already and we can't simply look at the
+                        // value on `selectedObjects` because then we won't know if
+                        // `selectedObjects[obj.id] === undefined` means they
+                        // haven't interacted with that checkbox or if it means they
+                        // explicitly set it to false. We could keep the key but set
+                        // the value to null, but that clutters up `selectedObjects`
+                        // because some values are objects and some are null. If we
+                        // use a separate set to remember which checkboxes the user
+                        // has interacted with, then we don't need to clutter up
+                        // `selectedObjects`.
+                        view.idsOfObjectsTheUserHasInteractedWith_[val[0]] = true;
+
+                        var checked = newValueSlot.get();
+
+                        if ( checked ) {
+                          var modification = {};
+                          if ( !thisObjValue ) {
+                            dao.find(val[0]).then(v => {
+                              modification[val[0]] = v;
+                              view.selectedObjects = Object.assign({}, view.selectedObjects, modification);
+                            });
+                          } else {
+                            modification[val[0]] = thisObjValue;
+                            view.selectedObjects = Object.assign({}, view.selectedObjects, modification);
+                          }
+
+                        } else {
+                          var temp = Object.assign({}, view.selectedObjects);
+                          delete temp[val[0]];
+                          view.selectedObjects = temp;
+                        }
+                      }));
+
+                      // Store each CheckBox Element in a map so we have a reference
+                      // to them so we can set the `data` property of them when the
+                      // user checks the box to enable or disable all checkboxes.
+                      var checkbox = slot.get();
+                      view.checkboxes_[val[0]] = checkbox;
+                      checkbox.onDetach(function() {
+                        delete view.checkboxes_[val[0]];
+                      });
                     });
-                  });
 
                   for ( var  i = 0 ; i < view.columns_.length ; i++  ) {
                     var prop = view.props.find(p => p.fullPropertyName === view.columnHandler.checkIfArrayAndReturnPropertyNamesForColumn(view, view.columns_[i])).property;
@@ -577,6 +577,7 @@ foam.CLASS({
 
                   tableRowElement
                     .start()
+                      .startContext({ data: tbodyElement })
                       .addClass(view.myClass('td')).
                       attrs({ name: 'contextMenuCell' }).
                       style({ flex: `0 0 ${view.EDIT_COLUMNS_BUTTON_CONTAINER_WIDTH}px` }).
@@ -585,6 +586,7 @@ foam.CLASS({
                         objId: val[0],
                         dao: dao
                       }).
+                      endContext().
                     end();
                   tbodyElement.add(tableRowElement);
                 });
