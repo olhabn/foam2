@@ -430,10 +430,9 @@ foam.CLASS({
                   var tableRowElement = this.E();
                   tableRowElement.
                     addClass(view.myClass('tr')).
-                    startContext({ data: tbodyElement }).
-                    on('mouseover', function() {
-                      if ( !thisObjValue ) {
-                        dao.find(val[0]).then(v => {
+                    on('mouseover', () => {
+                      if ( ! thisObjValue ) {
+                        dao.find_(view.__context__, val[0]).then(v => {
                         thisObjValue = v;
                         view.hoverSelection = thisObjValue;
                       });
@@ -441,8 +440,8 @@ foam.CLASS({
                         view.hoverSelection = thisObjValue;
                     }).
                     callIf(view.dblclick && ! view.disableUserSelection, function() {
-                      tableRowElement.on('dblclick', function() {
-                        if ( !thisObjValue ) {
+                      tableRowElement.on('dblclick', () => {
+                        if ( ! thisObjValue ) {
                           dao.find(val[0]).then(function(v) {
                             thisObjValue = v;
                             view.dblclick && view.dblclick(thisObjValue);
@@ -452,7 +451,7 @@ foam.CLASS({
                       });
                     }).
                     callIf( ! view.disableUserSelection, function() {
-                      tableRowElement.on('click', function(evt) {
+                      tableRowElement.on('click', (evt) => {
                         // If we're clicking somewhere to close the context menu,
                         // don't do anything.
                         if (
@@ -460,7 +459,7 @@ foam.CLASS({
                           evt.target.classList.contains(view.myClass('vertDots'))
                         ) return;
 
-                        if  ( !thisObjValue ) {
+                        if  ( ! thisObjValue ) {
                           dao.find(val[0]).then(v => {
                             view.selection = v;
                             if ( view.importSelection$ ) view.importSelection = v;
@@ -472,7 +471,6 @@ foam.CLASS({
                         }
                       });
                     }).
-                    endContext().
                     addClass(view.slot(function(selection) {
                       return selection && foam.util.equals(val[0], selection.id) ?
                           view.myClass('selected') : '';
@@ -523,7 +521,7 @@ foam.CLASS({
 
                         if ( checked ) {
                           var modification = {};
-                          if ( !thisObjValue ) {
+                          if ( ! thisObjValue ) {
                             dao.find(val[0]).then(v => {
                               modification[val[0]] = v;
                               view.selectedObjects = Object.assign({}, view.selectedObjects, modification);

@@ -128,14 +128,10 @@ foam.CLASS({
 
   methods: [
     async function initE() {
+
       var self = this;
-      if ( ! this.obj )
-        this.obj = await this.dao.find(this.objId);
+
       this.onDetach(this.active_$.follow(this.overlay_.opened$));
-      this.onDetach(this.disabled_$.follow(this.ExpressionSlot.create({
-        args: this.data.map((action) => action.createIsAvailable$(this.__context__, this.obj)),
-        code: (...rest) => ! rest.reduce((l, r) => l || r, false)
-      })));
 
       this.
         addClass(this.myClass()).
@@ -148,7 +144,7 @@ foam.CLASS({
               this.
                 on('mouseover', self.onMouseOver).
                 on('mouseout', self.onMouseOut).
-                on('click', function(evt) {
+                on('click', (evt) => {
                   if ( self.disabled_ ) return;
                   if ( ! self.overlayInitialized_ ) self.initializeOverlay();
                   self.overlay_.open(evt.clientX, evt.clientY);
@@ -158,13 +154,17 @@ foam.CLASS({
         end();
     },
 
-    function initializeOverlay() {
+    async function initializeOverlay() {
       var self = this;
-
+      
       if ( ! this.obj ) {
-        this.dao.find(this.objId).then(function(val) {
-          self.obj = val;
-        });
+        self.obj = await this.dao.find(this.objId);//.then(function(val) {
+
+          self.onDetach(self.disabled_$.follow(self.ExpressionSlot.create({
+            args: self.data.map((action) => action.createIsAvailable$(self.__context__, self.obj)),
+            code: (...rest) => ! rest.reduce((l, r) => l || r, false)
+          })));
+        //});
       }
 
       this.overlay_.add(this.slot(function() {
