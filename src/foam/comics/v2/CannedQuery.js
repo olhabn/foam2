@@ -27,6 +27,8 @@ foam.CLASS({
     },
     {
       class: 'foam.mlang.predicate.PredicateProperty',
+      javaType: 'foam.mlang.predicate.AbstractPredicate',
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
       name: 'predicate',
       expression: function(predicateFactory) {
         return predicateFactory ?

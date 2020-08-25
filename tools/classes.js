@@ -340,6 +340,7 @@ var classes = [
   'foam.comics.v2.BasicEnabledActionsAuth',
   'foam.comics.v2.CRUDEnabledActionsAuth',
   'foam.comics.v2.CannedQuery',
+  'foam.comics.v2.UserSpecificCannedQuery',
   'foam.comics.v2.namedViews.NamedViewCollection',
   'foam.comics.v2.namedViews.NamedViewInstance',
   'foam.comics.v2.userfeedback.UserFeedbackAware',

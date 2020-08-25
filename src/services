@@ -1135,3 +1135,19 @@ p({
   """,
   "client": "{\"of\":\"foam.nanos.auth.TimeZone\"}"
 })
+
+p({
+  "class":"foam.nanos.boot.NSpec",
+  "name":"userSpecificCannedQueryDAO",
+  "lazy":false,
+  "serve":true,
+  "authenticate": true,
+  "serviceScript":"""
+    import foam.dao.DAO;
+    return new foam.dao.EasyDAO.Builder(x)
+      .setAuthorize(true)
+      .setOf(foam.comics.v2.UserSpecificCannedQuery.getOwnClassInfo())
+      .build();
+  """,
+  "client":"{\"of\":\"foam.comics.v2.UserSpecificCannedQuery\", \"remoteListenerSupport\": false}"
+})
