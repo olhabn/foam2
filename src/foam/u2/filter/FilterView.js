@@ -27,7 +27,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'searchColumns'
+    'searchColumns',
+    'group'
   ],
 
   exports: [
@@ -248,6 +249,40 @@ foam.CLASS({
       expression: function(filterController$isAdvanced) {
         return filterController$isAdvanced ? this.LINK_SIMPLE : this.LINK_ADVANCED;
       }
+    },
+    { 
+      class: 'FObjectProperty',
+      of: 'foam.comics.v2.UserSpecificCannedQuery',
+      name: 'cannedQueriesOption',
+      view: function(_, X) {
+        var predicates = foam.mlang.Expressions.create();
+        return foam.u2.view.ChoiceView.create({
+          dao: X.userSpecificCannedQueryDAO.where(
+            predicates.OR(
+              predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.queryUser, X.subject.user.id),
+              predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.queryGroup, X.group.id),
+              predicates.AND(
+                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.queryUser, null),
+                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.queryGroup, null)
+              )
+            )
+          ),
+          objToChoice: function(a) {
+            return [a.id, a.id];
+          }
+        });
+      }
+    },
+    { 
+      class: 'String',
+      name: 'cannedQueryName',
+      view: {
+        class: 'foam.u2.TextField',
+        placeholder: 'Save Query As...'
+      },
+      postSet: function() {
+        
+      }
     }
   ],
 
@@ -309,6 +344,13 @@ foam.CLASS({
                 .end()
             .end()
             .start().addClass(self.myClass('container-footer'))
+              .start()
+                .add('saved queries: ')
+                .tag(self.CANNED_QUERIES_OPTION)
+              .end()
+              .start()
+                .tag(self.CANNED_QUERY_NAME)
+              .end()
               .start('p')
                 .addClass(self.myClass('label-results'))
                 .add(self.resultLabel$)

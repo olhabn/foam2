@@ -39,6 +39,10 @@ foam.CLASS({
     {
       name: 'predicateFactory',
       hidden: true
+    },
+    {
+      name: 'propertyName',
+      class: 'String'
     }
   ]
 }); 
