@@ -7,11 +7,28 @@
 foam.CLASS({
   package: 'foam.comics.v2',
   name: 'UserSpecificCannedQuery',
+  implements: [
+    'foam.nanos.auth.CreatedByAware'
+  ],
 
   properties: [
     {
       name: 'id',
       class: 'Long'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdByAgent',
+    },
+    {
+      class: 'String',
+      name: 'name'
     },
     {
       class: 'Reference',
@@ -24,8 +41,8 @@ foam.CLASS({
       name: 'queryGroup'
     },
     {
-      name: 'query',
-      class: 'FObjectProperty',
+      name: 'queries',
+      class: 'FObjectArray',
       of: 'foam.comics.v2.CannedQuery'
     }
   ]

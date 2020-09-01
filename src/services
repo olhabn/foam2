@@ -1149,6 +1149,8 @@ p({
     import foam.dao.DAO;
     return new foam.dao.EasyDAO.Builder(x)
       .setAuthorize(true)
+      .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
+      .setJournalName("userSpecificCannedQueries")
       .setOf(foam.comics.v2.UserSpecificCannedQuery.getOwnClassInfo())
       .build();
   """,

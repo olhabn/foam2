@@ -28,7 +28,9 @@ foam.CLASS({
 
   imports: [
     'searchColumns',
-    'group'
+    'group',
+    'subject',
+    'userSpecificCannedQueryDAO'
   ],
 
   exports: [
@@ -284,7 +286,16 @@ foam.CLASS({
         placeholder: 'Save Query As...'
       },
       postSet: function() {
-        
+        if ( this.cannedQueryName && this.cannedQueryName.length ) {
+          var cannedQueries = [];
+          for (const [key, criteria] of Object.entries(this.filterController.criterias)) {
+            for (const [viewKey, view] of Object.entries(criteria.views)) {
+              cannedQueries.push(foam.comics.v2.CannedQuery.create({ propertyName: view.property ? view.property.name : null , predicate: view.predicate }));
+            }
+          }
+          var userCannedQuery = foam.comics.v2.UserSpecificCannedQuery.create({ name: this.cannedQueryName, queryUser: this.subject.user.id, queryGroup: this.group.id, queries: cannedQueries });
+          this.userSpecificCannedQueryDAO.put(userCannedQuery);
+        }
       }
     }
   ],
