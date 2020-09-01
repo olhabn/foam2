@@ -260,7 +260,10 @@ foam.CLASS({
           dao: X.userSpecificCannedQueryDAO.where(
             predicates.OR(
               predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.queryUser, X.subject.user.id),
-              predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.queryGroup, X.group.id),
+              predicates.AND(
+                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.queryUser, null),
+                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.queryGroup, X.group.id)
+              ),
               predicates.AND(
                 predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.queryUser, null),
                 predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.queryGroup, null)
