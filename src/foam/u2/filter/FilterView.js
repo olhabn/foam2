@@ -259,14 +259,14 @@ foam.CLASS({
         return foam.u2.view.ChoiceView.create({
           dao: X.userSpecificCannedQueryDAO.where(
             predicates.OR(
-              predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.queryUser, X.subject.user.id),
+              predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.QUERY_USER, X.subject.user.id),
               predicates.AND(
-                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.queryUser, null),
-                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.queryGroup, X.group.id)
+                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.QUERY_USER, null),
+                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.QUERY_GROUP, X.group.id)
               ),
               predicates.AND(
-                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.queryUser, null),
-                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.queryGroup, null)
+                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.QUERY_USER, null),
+                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.QUERY_GROUP, null)
               )
             )
           ),
