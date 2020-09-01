@@ -33,7 +33,6 @@ foam.CLASS({
   ],
 
   imports: [
-    'ctrl',
     'dblclick?',
     'editRecord?',
     'filteredTableColumns?',
@@ -433,24 +432,25 @@ foam.CLASS({
               addClass(view.myClass('tbody'));
               valPromises.then(function(values) {
 
-                tbodyElement.forEach(values.array, function(val) {
+                tbodyElement.forEach(values.projection, function(val) {
                   var thisObjValue;
                   var tableRowElement = this.E();
                   tableRowElement.
                   addClass(view.myClass('tr')).
                   on('mouseover', function() {
-                    if ( !thisObjValue ) {
-                      dao.inX(ctrl.__subContext__).find(val[0]).then(v => {
-                      thisObjValue = v;
+                    if ( ! thisObjValue ) {
+                      dao.find(val[0]).then(v => {
+                        thisObjValue = v;
+                        view.hoverSelection = thisObjValue;
+                      });
+                    } else {
                       view.hoverSelection = thisObjValue;
-                    });
-                    } else
-                      view.hoverSelection = thisObjValue;
+                    }
                   }).
                   callIf(view.dblclick && ! view.disableUserSelection, function() {
                     tableRowElement.on('dblclick', function() {
-                      if ( !thisObjValue ) {
-                        dao.inX(ctrl.__subContext__).find(val[0]).then(function(v) {
+                      if ( ! thisObjValue ) {
+                        dao.find(val[0]).then(function(v) {
                           thisObjValue = v;
                           view.dblclick && view.dblclick(thisObjValue);
                         });
@@ -467,8 +467,8 @@ foam.CLASS({
                         evt.target.classList.contains(view.myClass('vertDots'))
                       ) return;
 
-                      if  ( !thisObjValue ) {
-                        dao.inX(ctrl.__subContext__).find(val[0]).then(v => {
+                      if  ( ! thisObjValue ) {
+                        dao.find(val[0]).then(v => {
                           view.selection = v;
                           if ( view.importSelection$ ) view.importSelection = v;
                           if ( view.editRecord$ ) view.editRecord(v);
