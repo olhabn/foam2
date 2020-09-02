@@ -42,7 +42,7 @@ foam.CLASS({
     },
     {
       name: 'propertyName',
-      class: 'String'
+      class: 'String'//change to criteria name
     }
   ]
 }); 

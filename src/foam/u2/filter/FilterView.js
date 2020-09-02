@@ -253,28 +253,46 @@ foam.CLASS({
       }
     },
     { 
-      class: 'FObjectProperty',
-      of: 'foam.comics.v2.UserSpecificCannedQuery',
+      // class: 'Reference',
+      // of: 'foam.comics.v2.UserSpecificCannedQuery',
       name: 'cannedQueriesOption',
       view: function(_, X) {
         var predicates = foam.mlang.Expressions.create();
         return foam.u2.view.ChoiceView.create({
           dao: X.userSpecificCannedQueryDAO.where(
-            predicates.OR(
-              predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.QUERY_USER, X.subject.user.id),
-              predicates.AND(
-                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.QUERY_USER, null),
-                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.QUERY_GROUP, X.group.id)
+            predicates.AND(
+              predicates.OR(
+                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.QUERY_USER, X.subject.user.id),
+                predicates.AND(
+                  predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.QUERY_USER, null),
+                  predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.QUERY_GROUP, X.group.id)
+                ),
+                predicates.AND(
+                  predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.QUERY_USER, null),
+                  predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.QUERY_GROUP, null)
+                )
               ),
-              predicates.AND(
-                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.QUERY_USER, null),
-                predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.QUERY_GROUP, null)
-              )
+              predicates.EQ(foam.comics.v2.UserSpecificCannedQuery.MODEL, X.filterController.dao.of.id)
             )
           ),
           objToChoice: function(a) {
-            return [a.id, a.id];
+            return [a.id, a.name];
+          },
+          placeholder: '--'
+        });
+      },
+      postSet: function() {
+        // if ( ! this.cannedQueriesOption )
+        //   return;
+        var self = this;
+        this.userSpecificCannedQueryDAO.find(this.cannedQueriesOption).then(val => {
+          for ( var i = 0 ; i < val.queries.length ; i ++ ) {
+            this.filterController.criterias[0].predicates[ val.queries[i].propertyName ] = val.queries[i].predicate;
+            if ( this.filterController.criterias[0].views[val.queries[i].propertyName] ) {
+              this.filterController.criterias[0].views[val.queries[i].propertyName].predicate = val.queries[i].predicate;
+            }
           }
+          this.filterController.updateFilterPredicate();
         });
       }
     },
@@ -288,12 +306,12 @@ foam.CLASS({
       postSet: function() {
         if ( this.cannedQueryName && this.cannedQueryName.length ) {
           var cannedQueries = [];
-          for (const [key, criteria] of Object.entries(this.filterController.criterias)) {
-            for (const [viewKey, view] of Object.entries(criteria.views)) {
-              cannedQueries.push(foam.comics.v2.CannedQuery.create({ propertyName: view.property ? view.property.name : null , predicate: view.predicate }));
+          for ( const [key, criteria] of Object.entries(this.filterController.criterias) ) {
+            for ( const [predicateKey, predicate] of Object.entries(criteria.predicates) ) {
+              cannedQueries.push(foam.comics.v2.CannedQuery.create({ propertyName: predicateKey , predicate: predicate }));
             }
           }
-          var userCannedQuery = foam.comics.v2.UserSpecificCannedQuery.create({ name: this.cannedQueryName, queryUser: this.subject.user.id, queryGroup: this.group.id, queries: cannedQueries });
+          var userCannedQuery = foam.comics.v2.UserSpecificCannedQuery.create({ name: this.cannedQueryName, queryUser: this.subject.user.id, queryGroup: this.group.id, model: this.filterController.dao.of.id, queries: cannedQueries });
           this.userSpecificCannedQueryDAO.put(userCannedQuery);
         }
       }
@@ -303,6 +321,20 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+      this.cannedQueriesOption$.sub(function() {
+        console.log(self.cannedQueriesOption);
+        if ( ! self.cannedQueriesOption ) {
+          self.userSpecificCannedQueryDAO.find(self.cannedQueriesOption).then(val => {
+            for ( var i = 0 ; i < val.queries.length ; i ++ ) {
+              self.filterController.criterias[0].predicates[ val.queries[i].propertyName ] = null;
+              // if ( self.filterController.criterias[0].views[val.queries[i].propertyName] ) {
+              //   self.filterController.criterias[0].views[val.queries[i].propertyName].predicate = val.queries[i].predicate;
+              // }
+            }
+            self.filterController.updateFilterPredicate();
+          });
+        }
+      });
       this.onDetach(this.filterController$.dot('isAdvanced').sub(this.isAdvancedChanged));
       this.addClass(self.myClass())
         .add(this.slot(function(filters) {

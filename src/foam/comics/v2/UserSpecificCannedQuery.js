@@ -17,6 +17,10 @@ foam.CLASS({
       class: 'Long'
     },
     {
+      class: 'String',
+      name: 'model'
+    },
+    {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
