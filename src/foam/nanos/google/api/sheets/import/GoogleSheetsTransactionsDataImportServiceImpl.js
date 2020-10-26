@@ -13,6 +13,7 @@ foam.CLASS({
     'foam.nanos.auth.Subject',
     'foam.nanos.auth.User',
     'foam.core.PropertyInfo',
+    'java.util.Arrays',
     'net.nanopay.bank.BankAccount',
     'net.nanopay.model.Business',
     'net.nanopay.tx.model.Transaction',
@@ -28,6 +29,10 @@ foam.CLASS({
         {
           name: 'x',
           type: 'Context',
+        },
+        {
+          name: 'importConfig',
+          type: 'foam.nanos.google.api.sheets.GoogleSheetsImportConfig'
         },
         {
           name: 'obj',
@@ -47,7 +52,7 @@ foam.CLASS({
 
         String baseCurrency = ((Business)payer).getSuggestedUserTransactionInfo().getBaseCurrency();
 
-        if ( t.getSourceCurrency() == null )
+        if ( t.getSourceCurrency() == null || ! Arrays.stream(importConfig.getColumnHeaderPropertyMappings()).anyMatch(p -> p.getProp().getName().equals("sourceCurrency")) )
           t.setSourceCurrency(baseCurrency);
 
         BankAccount payerBankAccount = BankAccount.findDefault(x, payer, t.getSourceCurrency());

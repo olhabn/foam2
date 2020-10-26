@@ -225,7 +225,7 @@
           Object val = data.get(i).get(columnIndex);
           pasreAndSetValue(x, obj, importConfig.getColumnHeaderPropertyMappings()[j], data.get(i).get(columnIndex));
         }
-        postSetValues(x, obj);
+        postSetValues(x, importConfig, obj);
         objs.add((FObject)obj);
       }
       return objs;
@@ -238,6 +238,10 @@
       {
         name: 'x',
         type: 'Context',
+      },
+      {
+        name: 'importConfig',
+        type: 'foam.nanos.google.api.sheets.GoogleSheetsImportConfig'
       },
       {
         name: 'obj',
