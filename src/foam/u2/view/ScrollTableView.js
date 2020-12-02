@@ -11,7 +11,8 @@
 
   imports: [
     'stack',
-    'memento'
+    'memento',
+    'document', 'window'
   ],
 
   exports: [
@@ -139,7 +140,8 @@
     },
     {
       class: 'Int',
-      name: 'scrollPos_'
+      name: 'scrollPos_',
+      value: 3242
     },
     {
       class: 'Int',
@@ -188,7 +190,11 @@
         }
       }
     },
-    'currentMemento'
+    'currentMemento',
+    {
+      name: 'isScrollSet',
+      class: 'Boolean',
+    }
   ],
 
   reactions: [
@@ -199,6 +205,8 @@
   methods: [
     function init() {
       this.onDetach(this.data$proxy.listen(this.FnSink.create({ fn: this.updateCount })));
+      this.onload.sub(this.setScrollPositionWithMemento);
+
       this.updateCount();
 
       if ( this.memento )
@@ -208,6 +216,7 @@
     },
 
     function initE() {
+      var self = this;
 
       if ( this.currentMemento ) {
         var id = this.currentMemento.head;
@@ -221,43 +230,54 @@
           config: this.config,
           id: id
         }, this);
+      } else {
+        this.
+          addClass(this.myClass()).
+          on('scroll', this.onScroll).
+          start(this.TableView, {
+            data: foam.dao.NullDAO.create({of: this.data.of}),
+            columns: this.columns,
+            contextMenuActions: this.contextMenuActions,
+            selection$: this.selection$,
+            editColumnsEnabled: this.editColumnsEnabled,
+            disableUserSelection: this.disableUserSelection,
+            multiSelectEnabled: this.multiSelectEnabled,
+            selectedObjects$: this.selectedObjects$
+          }, this.table_$).
+            addClass(this.myClass('table')).
+            style({
+              height: this.scrollHeight$.map(h => h + 'px')
+            }).
+          end();
+
+        /*
+          to be used in cases where we don't want the whole table to
+          take the whole page (i.e. we need multiple tables)
+          and enableDynamicTableHeight can be switched off
+        */
+        if ( this.enableDynamicTableHeight ) {
+          this.onDetach(this.onload.sub(this.updateTableHeight));
+          window.addEventListener('resize', this.updateTableHeight);
+          this.onDetach(() => {
+            window.removeEventListener('resize', this.updateTableHeight);
+          });
+        }
       }
 
-      this.
-        addClass(this.myClass()).
-        on('scroll', this.onScroll).
-        start(this.TableView, {
-          data: foam.dao.NullDAO.create({of: this.data.of}),
-          columns: this.columns,
-          contextMenuActions: this.contextMenuActions,
-          selection$: this.selection$,
-          editColumnsEnabled: this.editColumnsEnabled,
-          disableUserSelection: this.disableUserSelection,
-          multiSelectEnabled: this.multiSelectEnabled,
-          selectedObjects$: this.selectedObjects$
-        }, this.table_$).
-          addClass(this.myClass('table')).
-          style({
-            height: this.scrollHeight$.map(h => h + 'px')
-          }).
-        end();
-
-      /*
-        to be used in cases where we don't want the whole table to
-        take the whole page (i.e. we need multiple tables)
-        and enableDynamicTableHeight can be switched off
-      */
-      if ( this.enableDynamicTableHeight ) {
-        this.onDetach(this.onload.sub(this.updateTableHeight));
-        window.addEventListener('resize', this.updateTableHeight);
-        this.onDetach(() => {
-          window.removeEventListener('resize', this.updateTableHeight);
-        });
-      }
+      this.scrollPos_$.sub(function() {
+        self.memento.paramsObj.scroll = self.scrollPos_;
+        self.memento.paramsObj = Object.assign({}, self.memento.paramsObj);
+      })
     }
   ],
 
   listeners: [
+    function setScrollPositionWithMemento() {
+      if ( this.memento.paramsObj.scroll && this.memento.paramsObj.scroll  > 0) {
+        this.el().scrollTop = this.memento.paramsObj.scroll;
+        // document.getElementById(this.id).scrollTop = 200
+      }
+    },
     {
       name: 'refresh',
       isFramed: true,
@@ -307,6 +327,10 @@
           });
           this.table_.add(tbody);
           this.renderedPages_[page] = tbody;
+        }
+        if ( this.numPages_ !== 0 && ! this.isScrollSet ) {
+          this.setScrollPositionWithMemento();
+          this.isScrollSet = true;
         }
       }
     },
