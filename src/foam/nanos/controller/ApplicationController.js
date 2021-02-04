@@ -569,11 +569,19 @@ foam.CLASS({
       }
     },
 
-    function pushMenu(menu, opt_forceReload) {
+    async function pushMenu(menu, opt_forceReload) {
       if ( menu.id ) {
         menu.launch(this);
         menu = menu.id;
       }
+      
+      //handling returning to main menu on side menu click if user opened a record from a table for example
+      if ( this.memento.head === menu && this.memento.tail ) {
+        var subMenu = await this.__subContext__.menuDAO.find(this.memento.tail.head);
+        if ( subMenu == null )
+          this.memento.tail = null;
+      }
+
       /** Use to load a specific menu. **/
       // Do it this way so as to not reset mementoTail if set
       if ( this.memento.head !== menu || opt_forceReload ) {
